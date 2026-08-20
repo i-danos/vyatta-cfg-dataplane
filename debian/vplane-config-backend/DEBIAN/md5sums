@@ -1,0 +1,7 @@
+30d75eb715ff58978169230f3cba7417  opt/vyatta/sbin/vplane-affinity
+a6857931562101c8e5f53b463862d981  opt/vyatta/sbin/vplane-blink
+cfbde94dfb1aee954bded137ca8dc808  opt/vyatta/sbin/vplane-cpumask
+78edfd5e88958d1bf2898dced601fc28  opt/vyatta/sbin/vplane-power-profile
+9d363571dc41d67f8be093418184df0c  opt/vyatta/sbin/vplane-slowpath
+7aae03efaa12562165635091238d0b99  usr/share/doc/vplane-config-backend/changelog.gz
+8628579a516f5c6ac84daeeb95dcc26e  usr/share/doc/vplane-config-backend/copyright

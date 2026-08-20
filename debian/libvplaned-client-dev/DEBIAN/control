@@ -1,0 +1,12 @@
+Package: libvplaned-client-dev
+Source: vplane-config
+Version: 2.101.5
+Architecture: amd64
+Maintainer: Vyatta Package Maintainers <DL-vyatta-help@att.com>
+Installed-Size: 23
+Depends: libprotobuf-dev, libjansson-dev, libzmq3-dev, cppzmq-dev, libvyatta-dataplane-proto-dev, libvyatta-controller-proto-dev, libb64-dev
+Section: contrib/libdevel
+Priority: optional
+Multi-Arch: same
+Description: Provides C++ language headers for vplaned API.
+ C++ client headers for vplaned.

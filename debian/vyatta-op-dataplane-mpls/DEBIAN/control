@@ -1,0 +1,11 @@
+Package: vyatta-op-dataplane-mpls
+Source: vplane-config
+Version: 2.101.5
+Architecture: all
+Maintainer: Vyatta Package Maintainers <DL-vyatta-help@att.com>
+Installed-Size: 74
+Depends: vyatta-interfaces-dataplane-v1-yang (>= 2.101.5), vyatta-dataplane-op-mpls-1, perl:any
+Section: contrib/net
+Priority: optional
+Description: vyatta dataplane mpls package
+ Vyatta dataplane mpls template scripts.

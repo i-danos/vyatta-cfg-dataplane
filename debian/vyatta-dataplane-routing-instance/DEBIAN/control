@@ -1,0 +1,11 @@
+Package: vyatta-dataplane-routing-instance
+Source: vplane-config
+Version: 2.101.5
+Architecture: all
+Maintainer: Vyatta Package Maintainers <DL-vyatta-help@att.com>
+Installed-Size: 78
+Depends: vyatta-interfaces-dataplane-v1-yang (>= 2.101.5)
+Section: contrib/net
+Priority: optional
+Description: vyatta dataplane routing-instance package
+ Vyatta dataplane routing-instance specific template scripts.

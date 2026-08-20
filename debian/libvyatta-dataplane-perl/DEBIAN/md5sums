@@ -1,0 +1,7 @@
+a89185f08af2e3d4f8415d91de388ad8  opt/vyatta/share/perl5/Vyatta/Backplane.pm
+fd2b768198b52e0cbe8874da9d51760d  opt/vyatta/share/perl5/Vyatta/Dataplane.pm
+942b7b0401c5168627768876ef7fe390  opt/vyatta/share/perl5/Vyatta/DataplaneStats.pm
+08b9bd9552f24cc06d91c7a41cdd0af5  opt/vyatta/share/perl5/Vyatta/PCIid.pm
+bd4eb7784b00aaf5069e261754e9a0e0  opt/vyatta/share/perl5/Vyatta/SlowpathInfo.pm
+7aae03efaa12562165635091238d0b99  usr/share/doc/libvyatta-dataplane-perl/changelog.gz
+8628579a516f5c6ac84daeeb95dcc26e  usr/share/doc/libvyatta-dataplane-perl/copyright

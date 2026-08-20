@@ -1,0 +1,11 @@
+Package: vplane-config-backend
+Source: vplane-config
+Version: 2.101.5
+Architecture: all
+Maintainer: Vyatta Package Maintainers <DL-vyatta-help@att.com>
+Installed-Size: 36
+Depends: vyatta-dataplane (>= 3.13.39), libvyatta-vplaned-perl (>= 2.101.5), python3, perl:any
+Section: contrib/net
+Priority: optional
+Description: Backend scripts dealing with configd.
+ Various backend scripts dealing with configd access
