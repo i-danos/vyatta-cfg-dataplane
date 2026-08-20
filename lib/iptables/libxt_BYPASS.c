@@ -81,7 +81,7 @@ static struct xtables_target bypass_tg_reg[] = {
 	},
 };
 
-void _init(void)
+static void __attribute__((constructor)) bypass_tg_ld(void)
 {
 	xtables_register_targets(bypass_tg_reg, ARRAY_SIZE(bypass_tg_reg));
 }
