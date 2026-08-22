@@ -1,2 +1,0 @@
-help: Show dataplane MPLS configuration
-run: vplane-mpls.pl

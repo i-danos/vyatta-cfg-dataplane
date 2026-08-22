@@ -1,2 +1,0 @@
-help: Show dataplane MPLS statistics
-run: vplane-mpls.pl --interfaces --statistics

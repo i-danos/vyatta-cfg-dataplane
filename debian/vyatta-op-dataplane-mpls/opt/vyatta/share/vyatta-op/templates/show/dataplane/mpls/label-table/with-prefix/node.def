@@ -1,2 +1,0 @@
-help: Show dataplane MPLS label table with prefix
-run: vplane-route.pl --label-table --with-prefix

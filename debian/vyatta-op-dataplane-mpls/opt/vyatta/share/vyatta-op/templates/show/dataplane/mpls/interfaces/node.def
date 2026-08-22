@@ -1,2 +1,0 @@
-help: Show dataplane MPLS interfaces
-run: vplane-mpls.pl --interfaces
