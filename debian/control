@@ -33,7 +33,7 @@ Package: vplane-config
 Architecture: all
 Depends:
  bmon (>= 3.5),
- iproute (>= 20120319-vyatta+1),
+ iproute2,
  iputils-arping,
  libconfig-tiny-perl,
  libdata-validate-ip-perl,
