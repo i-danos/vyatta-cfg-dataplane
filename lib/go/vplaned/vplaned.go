@@ -170,6 +170,50 @@ func (c *Conn) Store(
 
 	cmd := "protobuf " + base64.StdEncoding.EncodeToString(vpeData)
 
+	return c.send(path, cmd, true, &storeOpts)
+}
+
+// StoreCommand stores a plain-text dataplane command, the form the console
+// takes: "dot1x enable dp0s3".
+//
+// Store() only offers the protobuf form, so a component whose dataplane
+// command is textual had no way to reach the store and would have had to use
+// the op channel instead. That is not equivalent: the op channel talks to a
+// running dataplane and nothing replays it, so the configuration is silently
+// lost when the dataplane restarts -- for anything that fails closed, that
+// means coming back open.
+//
+// The wire format is the one Vyatta::VPlaned::_to_tree builds for the same
+// case: the path expanded into nested objects, the command under __SET__ or
+// __DELETE__, and __PROTOBUF__ false.
+func (c *Conn) StoreCommand(
+	path, cmd string,
+	opts ...storeOpt,
+) error {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	storeOpts := storeOptions{}
+	for _, opt := range opts {
+		opt(&storeOpts)
+	}
+	if storeOpts.action == "" {
+		storeOpts.action = os.Getenv("COMMIT_ACTION")
+	}
+	if storeOpts.action == "" {
+		return ErrNoCommitAction
+	}
+
+	return c.send(path, cmd, false, &storeOpts)
+}
+
+// send builds the JSON the controller expects and waits for its reply. The
+// caller holds c.mu.
+func (c *Conn) send(
+	path, cmd string,
+	protobuf bool,
+	storeOpts *storeOptions,
+) error {
 	jobj := make(map[string]interface{})
 	tmp := jobj
 	for _, elem := range strings.Split(path, " ") {
@@ -181,7 +225,7 @@ func (c *Conn) Store(
 	if storeOpts.iface != "" {
 		tmp["__INTERFACE__"] = storeOpts.iface
 	}
-	tmp["__PROTOBUF__"] = true
+	tmp["__PROTOBUF__"] = protobuf
 
 	encodedMsg, err := json.Marshal(jobj)
 	if err != nil {
