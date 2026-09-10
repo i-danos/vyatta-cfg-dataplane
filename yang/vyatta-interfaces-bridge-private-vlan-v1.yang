@@ -53,6 +53,16 @@ module vyatta-interfaces-bridge-private-vlan-v1 {
 				"Restrict which other bridge members this port
 				 may reach.";
 			configd:help "Private VLAN port role";
+			/*
+			 * Higher than the 320 bridge-group carries, so the port
+			 * is already a member when this runs. Without it the
+			 * end script fires first and the dataplane rejects the
+			 * command with "not a bridge port" -- a message that
+			 * reaches the dataplane log and nowhere else, so the
+			 * commit looks clean, the configuration is in the tree,
+			 * and the port forwards as though no role were set.
+			 */
+			configd:priority "330";
 			configd:end "vyatta-private-vlan --action=$COMMIT_ACTION --dev=$VAR(../../@)";
 
 			leaf port-role {

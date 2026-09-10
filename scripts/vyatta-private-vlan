@@ -86,12 +86,23 @@ def configure(action, ifname):
 
 
 def main():
+    # $COMMIT_ACTION is SET, ACTIVE or DELETE, not just the two. ACTIVE means
+    # the node did not change in this commit but is still there, which happens
+    # on every commit that touches anything else under the same interface.
+    #
+    # Accepting only SET and DELETE made argparse exit non-zero on ACTIVE, and
+    # configd recorded that as "Error with no output" in its journal and said
+    # nothing at all on the commit -- the configuration went into the tree, the
+    # dataplane never heard about it, and the commit looked clean. Treat ACTIVE
+    # as SET: re-sending the same horizon is harmless and makes the dataplane
+    # converge if it ever missed one.
     parser = ArgumentParser()
-    parser.add_argument("--action", required=True, choices=["SET", "DELETE"])
+    parser.add_argument("--action", required=True,
+                        choices=["SET", "ACTIVE", "DELETE"])
     parser.add_argument("--dev", required=True)
     args = parser.parse_args()
 
-    configure(args.action, args.dev)
+    configure("DELETE" if args.action == "DELETE" else "SET", args.dev)
 
 
 if __name__ == "__main__":
