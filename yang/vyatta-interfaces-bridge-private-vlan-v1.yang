@@ -1,0 +1,123 @@
+module vyatta-interfaces-bridge-private-vlan-v1 {
+	namespace "urn:vyatta.com:mgmt:vyatta-interfaces-bridge-private-vlan:1";
+	prefix vyatta-interfaces-bridge-private-vlan-v1;
+
+	import vyatta-interfaces-v1 {
+		prefix if;
+	}
+	import vyatta-interfaces-dataplane-v1 {
+		prefix interfaces-dataplane;
+	}
+	import vyatta-interfaces-bridge-v1 {
+		prefix interfaces-bridge;
+	}
+	import configd-v1 {
+		prefix configd;
+	}
+
+	organization "i-danos";
+	contact
+		"https://github.com/i-danos";
+
+	description
+		"Private VLAN: restrict which members of a bridge may reach
+		 which.
+
+		 The three port roles are one rule with different arguments.
+		 A frame received on a port belonging to a group is not
+		 forwarded out another port in the same group, unless the group
+		 allows its members to reach each other:
+
+		   promiscuous   no group; reaches everything
+		   isolated      reaches promiscuous ports only
+		   community N   reaches promiscuous ports and community N
+
+		 The community identifier is not a VLAN. It costs nothing from
+		 the 4094 VLAN identifiers, and it is not carried in any frame;
+		 it names a group of ports on this bridge and nothing more.
+		 That is a deliberate difference from RFC 5517, where each
+		 isolated or community group consumes a secondary VLAN.
+
+		 Copyright (c) 2026, i-danos.
+
+		 SPDX-License-Identifier: LGPL-2.1-only";
+
+	revision 2026-09-10 {
+		description "Initial revision.";
+	}
+
+	grouping private-vlan-port {
+		container private-vlan {
+			presence "private VLAN port role";
+			description
+				"Restrict which other bridge members this port
+				 may reach.";
+			configd:help "Private VLAN port role";
+			configd:end "vyatta-private-vlan --action=$COMMIT_ACTION --dev=$VAR(../../@)";
+
+			leaf port-role {
+				type enumeration {
+					enum promiscuous {
+						description
+							"Reaches every member of
+							 the bridge. The role an
+							 uplink or a router port
+							 has.";
+						configd:help "Reaches every member";
+					}
+					enum isolated {
+						description
+							"Reaches promiscuous
+							 ports only, and no
+							 other isolated or
+							 community port.";
+						configd:help "Reaches promiscuous ports only";
+					}
+					enum community {
+						description
+							"Reaches promiscuous
+							 ports and the other
+							 ports of the same
+							 community.";
+						configd:help "Reaches promiscuous ports and its own community";
+					}
+				}
+				mandatory true;
+				description
+					"What this port may reach.";
+				configd:help "What this port may reach";
+			}
+
+			leaf community {
+				type uint16 {
+					range 1..4094;
+				}
+				description
+					"Which community this port belongs to.
+
+					 Ports sharing a community reach each
+					 other; ports in different communities
+					 do not. Not a VLAN identifier -- it
+					 names a group of ports and is never
+					 carried in a frame.";
+				configd:help "Community identifier";
+
+				must "../port-role = 'community'" {
+					error-message "community applies only when port-role is community";
+				}
+			}
+
+			must "port-role != 'community' or count(community) = 1" {
+				error-message "a community port needs a community identifier";
+			}
+		}
+	}
+
+	augment /if:interfaces/interfaces-dataplane:dataplane/interfaces-bridge:bridge-group {
+		description
+			"Private VLAN applies to a port's membership of a
+			 bridge, so it lives with the membership rather than on
+			 the interface as a whole.";
+		uses private-vlan-port;
+	}
+}

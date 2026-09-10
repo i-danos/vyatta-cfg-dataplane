@@ -1,0 +1,2 @@
+yang/vyatta-interfaces-bridge-private-vlan-v1.yang usr/share/configd/yang/
+scripts/vyatta-private-vlan /opt/vyatta/sbin/

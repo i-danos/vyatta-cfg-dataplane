@@ -283,6 +283,14 @@ Depends: python3, vyatta-dataplane-cfg-pb-vyatta:maclimit-0, ${misc:Depends},
 Description: vyatta MAC limiting
  YANG module for configuring MAC limiting
 
+Package: vyatta-interfaces-bridge-private-vlan-v1-yang
+Architecture: all
+Depends: python3, vyatta-dataplane-cfg-pb-vyatta:private-vlan-0, ${misc:Depends},
+         ${yang:Depends}
+Description: Private VLAN for bridge ports
+ YANG module for restricting which members of a bridge may reach which,
+ carried to the dataplane as split horizon on the bridge port.
+
 Package: vyatta-interfaces-dataplane-rpc-v1-yang
 Architecture: all
 Depends: ${misc:Depends}, ${yang:Depends},
