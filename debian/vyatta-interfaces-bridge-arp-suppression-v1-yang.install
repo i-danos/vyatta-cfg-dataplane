@@ -1,0 +1,2 @@
+yang/vyatta-interfaces-bridge-arp-suppression-v1.yang usr/share/configd/yang/
+scripts/vyatta-bridge-arp-suppression /opt/vyatta/sbin/

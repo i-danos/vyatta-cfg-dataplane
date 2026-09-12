@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+
+# Copyright (c) 2026, i-danos.
+#
+# SPDX-License-Identifier: LGPL-2.1-only
+#
+# Tell the dataplane whether a bridge should answer ARP from its neighbour
+# table instead of flooding the request.
+#
+# There is nothing to translate here -- the node is an empty leaf and the
+# command carries only the bridge name -- so this is a script on the
+# configuration path rather than a component, the same shape as
+# vyatta-private-vlan.
+
+from argparse import ArgumentParser
+
+from vplaned import Controller
+from vyatta.proto import ArpSuppressionConfig_pb2
+
+
+def configure(action, ifname):
+    cfg = ArpSuppressionConfig_pb2.ArpSuppressionConfig()
+    cfg.if_name = ifname
+    cfg.cmd = (ArpSuppressionConfig_pb2.ArpSuppressionConfig.DELETE
+               if action == "DELETE"
+               else ArpSuppressionConfig_pb2.ArpSuppressionConfig.SET)
+
+    key = "arp-suppression {}".format(ifname)
+    with Controller() as controller:
+        controller.store(key, cfg, "ALL", action,
+                         cmd_name="vyatta:arp-suppression")
+
+
+def main():
+    # $COMMIT_ACTION is SET, ACTIVE or DELETE. ACTIVE means the node did not
+    # change in this commit but is still present, which happens on every commit
+    # that touches anything else under the same bridge. Refusing it made
+    # argparse exit non-zero on the private-vlan script, and configd logged
+    # "Error with no output" and reported nothing on the commit -- the
+    # configuration was in the tree and the dataplane had never heard of it.
+    #
+    # Treated as SET here for the same reason: re-sending is harmless, and it
+    # makes the dataplane converge if it ever missed one.
+    parser = ArgumentParser()
+    parser.add_argument("--action", required=True,
+                        choices=["SET", "ACTIVE", "DELETE"])
+    parser.add_argument("--dev", required=True)
+    args = parser.parse_args()
+
+    configure("DELETE" if args.action == "DELETE" else "SET", args.dev)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,85 @@
+module vyatta-interfaces-bridge-arp-suppression-v1 {
+	namespace "urn:vyatta.com:mgmt:vyatta-interfaces-bridge-arp-suppression:1";
+	prefix vyatta-interfaces-bridge-arp-suppression-v1;
+
+	import vyatta-interfaces-v1 {
+		prefix if;
+	}
+	import vyatta-interfaces-bridge-v1 {
+		prefix interfaces-bridge;
+	}
+	import configd-v1 {
+		prefix configd;
+	}
+
+	organization "i-danos";
+	contact
+		"https://github.com/i-danos";
+
+	description
+		"Answer ARP for a remote host from what the control plane has
+		 already said, instead of flooding the request.
+
+		 In an EVPN fabric a type-2 route carries a host's MAC and its
+		 IP address together. zebra installs that pair on the bridge,
+		 and the dataplane holds it in the same neighbour table the
+		 routing path uses. Without this, every ARP for a remote host
+		 is broadcast to every leaf in the fabric to discover what BGP
+		 has already delivered -- and in a bridge domain that spans
+		 many leaves, that is most of the broadcast traffic there is.
+
+		 This is an optimisation, not a correctness fix. A bridge
+		 domain without it forwards exactly the same traffic, more
+		 noisily. It is worth switching on where a VXLAN tunnel is a
+		 member of the bridge and worth nothing where one is not: with
+		 no remote hosts, every address in the neighbour table was put
+		 there by this router's own ARP, so nothing is ever saved.
+
+		 Copyright (c) 2026, i-danos.
+
+		 SPDX-License-Identifier: LGPL-2.1-only";
+
+	revision 2026-09-12 {
+		description "Initial revision.";
+	}
+
+	augment /if:interfaces/interfaces-bridge:bridge {
+		description
+			"Suppression is a property of the bridge domain rather
+			 than of one port. A bridge that answered on one port
+			 and flooded on another would behave differently
+			 depending on where a request happened to arrive, which
+			 is not something an operator can reason about.";
+
+		leaf arp-suppression {
+			type empty;
+			description
+				"Answer ARP requests for hosts already in the
+				 neighbour table rather than flooding them.
+
+				 Requests for an address this bridge does not
+				 know are flooded as before, so a host that has
+				 not yet been advertised is still reachable --
+				 it just costs a broadcast the first time.
+
+				 'bridge <name> arp-suppression' in the
+				 dataplane reports how many requests were
+				 answered and how many still flooded. A flooded
+				 count that keeps rising on an EVPN bridge
+				 usually means the leaf the host sits behind
+				 has no address in that subnet, so it never
+				 learned the host's IP to advertise alongside
+				 its MAC.";
+			configd:help "Answer ARP from the neighbour table instead of flooding";
+			/*
+			 * The bridge has to exist before the dataplane will
+			 * accept a command naming it. 320 is what bridge-group
+			 * membership carries; this is the bridge itself, so
+			 * anything after the bridge is created will do, and
+			 * 330 keeps it beside the other bridge-level work.
+			 */
+			configd:priority "330";
+			configd:end "vyatta-bridge-arp-suppression --action=$COMMIT_ACTION --dev=$VAR(../@)";
+		}
+	}
+}

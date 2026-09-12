@@ -291,6 +291,14 @@ Description: Private VLAN for bridge ports
  YANG module for restricting which members of a bridge may reach which,
  carried to the dataplane as split horizon on the bridge port.
 
+Package: vyatta-interfaces-bridge-arp-suppression-v1-yang
+Architecture: all
+Depends: python3, vyatta-dataplane-cfg-pb-vyatta:arp-suppression-0, ${misc:Depends},
+         ${yang:Depends}
+Description: ARP suppression for bridge domains
+ YANG module for answering ARP requests from the neighbour table instead of
+ flooding them, which is what makes an EVPN bridge domain quiet.
+
 Package: vyatta-interfaces-dataplane-rpc-v1-yang
 Architecture: all
 Depends: ${misc:Depends}, ${yang:Depends},
